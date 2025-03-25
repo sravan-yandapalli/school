@@ -30,7 +30,7 @@ const OnlineFee = () => {
           min="1"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="border p-2 w-full text-center rounded-lg mt-4 focus:outline-none focus:ring-2 focus:ring-[#7357a4]"
+          className="border p-2 w-full text-center text-gray-500 rounded-lg mt-4 focus:outline-none focus:ring-2 focus:ring-[#7357a4]"
         />
       </div>
 
