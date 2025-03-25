@@ -1,23 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const dailyCurriculum = [
-  { day: "Monday", activities: ["✔️ Storytelling", "📖 Alphabet Learning", "🎨 Creative Art"] },
-  { day: "Tuesday", activities: ["🔢 Numbers & Counting", "🎶 Music & Dance", "🏃 Outdoor Play"] },
-  { day: "Wednesday", activities: ["🧪 Science Experiments", "✍️ Handwriting Practice", "🧩 Puzzle Solving"] },
-  { day: "Thursday", activities: ["🎲 Group Games", "📜 Poetry Reading", "🖌️ Clay Modeling"] },
-  { day: "Friday", activities: ["🎭 Role Play", "🌿 Nature Walk", "🎨 Color Recognition"] },
-  { day: "Saturday", activities: ["✂️ Crafts & DIY", "🎤 Sing-Along Songs", "🤝 Team Activities"] },
-  { day: "Sunday", activities: ["😌 Rest & Reflection", "👨‍👩‍👧‍👦 Family Time", "📚 Light Reading"] },
+  { day: "Monday", activities: ["✔️ Storytelling", "📖 Alphabet Learning", "🎨 Creative Art", "✂️ Crafts & DIY"] },
+  { day: "Tuesday", activities: ["🔢 Numbers & Counting", "🎶 Music & Dance", "🏃 Outdoor Play", "🎤 Sing-Along Songs"] },
+  { day: "Wednesday", activities: ["🧪 Science Experiments", "✍️ Handwriting Practice", "🧩 Puzzle Solving", "🤝 Team Activities"] },
+  { day: "Thursday", activities: ["🎲 Group Games", "📜 Poetry Reading", "🖌️ Clay Modeling", "👨‍👩‍👧‍👦 Family Time", "📚 Light Reading" ] },
+  { day: "Friday", activities: ["🎭 Role Play", "🌿 Nature Walk", "🎨 Color Recognition", "😌 Rest & Reflection"] },
 ];
 
 const Curriculum = () => {
   const [todayCurriculum, setTodayCurriculum] = useState<{ day: string; activities: string[] } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const currentDayIndex = new Date().getDay();
-    setTodayCurriculum(dailyCurriculum[currentDayIndex]);
+    setTodayCurriculum(dailyCurriculum[currentDayIndex - 1]); // Adjust for Sunday-based index
   }, []);
 
   return (
@@ -52,6 +52,14 @@ const Curriculum = () => {
           </div>
         ))}
       </div>
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mt-6 bg-[#7357a4] text-white px-6 py-3 rounded-lg hover:bg-[#5e4694] transition-all"
+      >
+        Back
+      </button>
     </div>
   );
 };

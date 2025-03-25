@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
 
 const UPI_ID = "yandapallisravankumar@oksbi"; // Your UPI ID
-const AMOUNT = "3000"; // Set the default amount
+const AMOUNT = "3000"; // Default amount
 
 const OnlineFee = () => {
   const [paymentDone, setPaymentDone] = useState(false);
+  const router = useRouter();
 
   // Generate UPI payment link
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=Your%20Name&am=${AMOUNT}&cu=INR`;
@@ -18,7 +20,7 @@ const OnlineFee = () => {
 
       {/* UPI QR Code */}
       <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-        <h2 className="text-xl font-semibold mb-2">Scan & Pay</h2>
+        <h2 className="text-xl text-gray-400 font-semibold mb-2">Scan & Pay</h2>
         <QRCodeCanvas value={upiLink} size={200} className="mx-auto mb-4" />
         <p className="text-sm text-gray-600">Scan the QR code or click the button below to pay.</p>
       </div>
@@ -26,7 +28,7 @@ const OnlineFee = () => {
       {/* Payment Link */}
       <a
         href={upiLink}
-        className="bg-[#7357a4] text-white px-6 py-2 rounded-lg shadow-md mt-4 hover:bg-[#5c4486]"
+        className="bg-[#7357a4] text-white px-6 py-2 rounded-lg shadow-md mt-4 hover:bg-[#5c4486] transition-all"
         onClick={() => setPaymentDone(true)}
       >
         Pay ₹{AMOUNT} via UPI
@@ -38,6 +40,14 @@ const OnlineFee = () => {
           ✅ Payment Completed Successfully!
         </div>
       )}
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mt-6 bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-700 transition-all"
+      >
+        Back
+      </button>
     </div>
   );
 };
