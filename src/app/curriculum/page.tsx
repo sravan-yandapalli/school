@@ -28,7 +28,7 @@ const Curriculum = () => {
       {todayCurriculum && (
         <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mb-8">
           <h2 className="text-2xl font-semibold text-[#7357a4] text-center">
-            Today's Curriculum - {todayCurriculum.day}
+            Today&apos;s Curriculum - {todayCurriculum.day}
           </h2>
           <ul className="mt-4 list-disc list-inside text-lg text-gray-900">
             {todayCurriculum.activities.map((activity, index) => (

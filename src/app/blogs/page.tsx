@@ -1,42 +1,72 @@
-"use client";
+"use client"; // Required for state management in Next.js App Router
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 const Blogs = () => {
-  const [videos, setVideos] = useState<File[]>([]);
-  const router = useRouter();
+    const [blogPosts, setBlogPosts] = useState<{ 
+        id: number;
+        title: string;
+        description: string;
+        date: string;
+        video: string; // Local video URL
+    }[]>([]);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setVideos([...videos, ...Array.from(event.target.files)]);
-    }
-  };
+    const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold text-[#37474f] mb-6">Blogs</h1>
-      
-      {/* Upload Video Button */}
-      <label className="cursor-pointer bg-[#7357a4] text-white px-6 py-2 rounded-lg shadow-md hover:bg-[#5c4486]">
-        Upload Video
-        <input type="file" accept="video/*" multiple hidden onChange={handleFileUpload} />
-      </label>
-      
-      {/* Video Gallery */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
-        {videos.map((video, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden p-4">
-            <video controls className="w-full h-48 object-cover">
-              <source src={URL.createObjectURL(video)} type={video.type} />
-            </video>
-            <p className="text-center mt-2 text-[#37474f] font-medium">{video.name}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        const videoUrl = URL.createObjectURL(file); // Create a temporary URL
+
+        const newPost = {
+            id: blogPosts.length + 1,
+            title: `Uploaded Video ${blogPosts.length + 1}`,
+            description: "This is a user-uploaded video blog.",
+            date: new Date().toLocaleDateString(),
+            video: videoUrl,
+        };
+
+        setBlogPosts([newPost, ...blogPosts]); // Add new video on top
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+            <h1 className="text-4xl font-bold text-gray-800 mb-6">Upload & Watch Blogs</h1>
+
+            {/* Video Upload Input */}
+            <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 hover:bg-blue-700">
+                Upload Video
+                <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={handleVideoUpload}
+                />
+            </label>
+
+            {/* Blog Posts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 w-full max-w-6xl">
+                {blogPosts.map((post) => (
+                    <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div className="relative w-full h-48">
+                            <Image src="/v1.jpeg" alt="Video Thumbnail" layout="fill" objectFit="cover" />
+                        </div>
+                        <div className="p-5">
+                            <h2 className="text-2xl font-semibold text-gray-800">{post.title}</h2>
+                            <p className="text-sm text-gray-500 mt-2">{post.date}</p>
+                            <p className="text-gray-600 mt-3">{post.description}</p>
+
+                            {/* Display Video */}
+                            <video controls className="w-full h-48 mt-4 rounded-lg">
+                                <source src={post.video} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default Blogs;

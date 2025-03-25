@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-const Admission = () => {
+const Admission: React.FC = () => {
     const [formData, setFormData] = useState({
         studentName: "",
         age: "",
@@ -13,11 +13,11 @@ const Admission = () => {
         message: ""
     });
 
-    const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         alert("Form submitted successfully!");
     };
@@ -37,7 +37,6 @@ const Admission = () => {
                             value={formData.studentName}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                             required
                         />
                         <input
@@ -47,7 +46,6 @@ const Admission = () => {
                             value={formData.age}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                             required
                         />
                         <input
@@ -57,7 +55,6 @@ const Admission = () => {
                             value={formData.parentName}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                             required
                         />
                         <input
@@ -67,7 +64,6 @@ const Admission = () => {
                             value={formData.contact}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                             required
                         />
                         <input
@@ -77,7 +73,6 @@ const Admission = () => {
                             value={formData.email}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                         />
                         <input
                             type="text"
@@ -86,7 +81,6 @@ const Admission = () => {
                             value={formData.address}
                             onChange={handleChange}
                             className="border p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                            spellCheck="false"
                         />
                     </div>
                     <textarea
@@ -95,7 +89,6 @@ const Admission = () => {
                         value={formData.message}
                         onChange={handleChange}
                         className="border p-3 rounded w-full h-28 mt-4 focus:outline-none focus:ring-2 focus:ring-[#7357a4] placeholder:text-gray-500 text-gray-900"
-                        spellCheck="false"
                     ></textarea>
                     <button
                         type="submit"
