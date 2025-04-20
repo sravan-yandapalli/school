@@ -3,7 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 // Initialize DynamoDB client
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || "ap-south-1" });
+const client = new DynamoDBClient({ region: process.env.MY_AWS_REGION || "ap-south-1" });
 const ddb = DynamoDBDocumentClient.from(client);
 
 export async function POST(req: NextRequest) {
