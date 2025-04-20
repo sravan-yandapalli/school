@@ -29,7 +29,7 @@ const SummerCampPopup = () => {
                 <h2 className="text-2xl font-bold text-violet-700 mb-2 text-center">🌞 Summer Camp Alert!</h2>
                 <p className="text-gray-800 text-base mb-4 text-center leading-relaxed">
                     Join the fun at Cocomelon&apos;s Summer Camp!<br />
-                    <strong>Dates:</strong> May 1&aposs;t – May 31st<br />
+                    <strong>Dates:</strong> May 1st – May 31st<br />
                     <strong>Fee:</strong> ₹2,000<br />
                     Limited seats – register now!
                 </p>
