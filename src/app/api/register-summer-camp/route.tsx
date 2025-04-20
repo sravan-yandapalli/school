@@ -1,46 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "ap-south-1" });
 const ddb = DynamoDBDocumentClient.from(client);
 
 export async function POST(req: NextRequest) {
-    const data = await req.json();
-
-    const {
-        parentName,
-        childName,
-        age,
-        contact,
-        email = "",
-        school = "",
-    } = data;
-
-    if (!parentName || !childName || !age || !contact) {
-        return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
-    }
-
     try {
-        await ddb.send(
-            new PutCommand({
-                TableName: process.env.DYNAMODB_CAMP_TABLE!,
-                Item: {
-                    contact: String(contact), // partition key
-                    email: String(email),
-                    parentName: String(parentName),
-                    childName: String(childName),
-                    age: String(age),
-                    school: String(school),
-                    registeredAt: new Date().toISOString(),
-                },
-            })
-        );
+        const data = await req.json();
+        console.log("Received Data:", data); // Debugging log
 
-        return NextResponse.json({ message: "Success" }, { status: 200 });
-    } catch (err) {
-        console.error("DynamoDB Error:", err);
-        return NextResponse.json({ message: "Failed to save", error: (err as Error).message }, { status: 500 });
+        const {
+            parentName,
+            childName,
+            age,
+            contact,
+            email = "",
+            school = "",
+        } = data;
+
+        // Validate required fields
+        if (!parentName || !childName || !age || !contact) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
+        const command = new PutCommand({
+            TableName: process.env.DYNAMODB_CAMP_TABLE!, // Make sure it's defined in .env.local
+            Item: {
+                registration_id: Date.now().toString(), // Unique ID
+                parentName,
+                childName,
+                age,
+                contact,
+                email,
+                school,
+                registeredAt: new Date().toISOString(),
+            },
+        });
+
+        await ddb.send(command);
+
+        return NextResponse.json({ message: "Registration successful" }, { status: 201 });
+
+    } catch (error) {
+        console.error("Error saving to DynamoDB:", JSON.stringify(error, null, 2));
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
