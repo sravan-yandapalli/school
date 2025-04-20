@@ -3,13 +3,16 @@
 import React, { JSX, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import SummerCampPopup from "./SummerCampPopup"; 
 
 export const Desktop = (): JSX.Element => {
     const router = useRouter();
     const [showMore, setShowMore] = useState(false); // Toggle State
 
     return (
+       
         <div className="bg-white flex justify-center items-center w-full min-h-screen">
+             <SummerCampPopup />
             <div className="bg-[#7357a4] w-full max-w-[1440px] px-6 sm:px-10 lg:px-20 py-10 relative rounded-lg">
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-center">

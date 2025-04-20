@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.774.0",
     "@aws-sdk/lib-dynamodb": "^3.774.0",
+    "framer-motion": "^12.7.4",
     "next": "15.2.3",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
