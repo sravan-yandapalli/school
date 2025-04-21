@@ -4,6 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
+console.log("Server ENV:", {
+    region: process.env.AWS_REGION,
+    table: process.env.DYNAMODB_CAMP_TABLE,
+    hasKey: !!process.env.AWS_ACCESS_KEY_ID,
+    hasSecret: !!process.env.AWS_SECRET_ACCESS_KEY
+  });
+  
 // Environment variables
 const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
 const TABLE_NAME = process.env.DYNAMODB_CAMP_TABLE!;
