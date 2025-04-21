@@ -1,3 +1,4 @@
+// File: src/app/page.tsx (or wherever your form is)
 "use client";
 
 import React, { useState } from "react";
@@ -24,6 +25,7 @@ const SummerCampPage = () => {
 
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(""); // For displaying errors
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,6 +34,7 @@ const SummerCampPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMessage(""); // Clear previous errors
 
         try {
             const res = await fetch("/api/register-summer-camp", {
@@ -40,29 +43,35 @@ const SummerCampPage = () => {
                 body: JSON.stringify(form),
             });
 
+            const data = await res.json(); // Parse the response body
+
             if (res.ok) {
                 setSubmitted(true);
-
                 // Redirect to UPI payment
                 const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
                 window.location.href = upiUrl;
             } else {
-                alert("Something went wrong!");
+                // Handle errors from the server
+                if (data && data.error) {
+                    setErrorMessage(data.error);
+                } else {
+                    setErrorMessage("Something went wrong!");
+                }
             }
         } catch (error) {
-            console.error(error);
-            alert("Failed to submit.");
+            console.error("Frontend Error:", error);
+            setErrorMessage("Failed to submit. Please check your connection.");
         }
 
         setLoading(false);
     };
 
     return (
+        // ... (Your JSX, with error message display)
         <div className="min-h-screen bg-gradient-to-br from-purple-100 to-violet-200 py-12 px-4 sm:px-8">
             <div className="max-w-3xl mx-auto bg-white shadow-2xl rounded-2xl p-8 border border-violet-200">
                 <h1 className="text-3xl sm:text-4xl font-bold text-violet-700 text-center mb-4">
                     🌞 Cocomelon&apos;s Summer Camp Registration
-
                 </h1>
 
                 {submitted ? (
@@ -71,17 +80,20 @@ const SummerCampPage = () => {
                     </p>
                 ) : (
                     <>
-                       <p className="text-gray-800 text-sm sm:text-base mb-6 text-center leading-relaxed">
-                         The camp runs from <strong>May 1&aposs;t to May 31st</strong>, 5 days a week.
-                        <br />
-                        📍 51-8, 57/2, 60 Feet Road, Nakkavanipalem, Visakhapatnam, AP <br />
-                        ☎ +91 6302164335 <br />
-                        💳 Registration Fee: ₹250 | Total Fee: ₹2,000–₹2,500
-                       </p>
+                        <p className="text-gray-800 text-sm sm:text-base mb-6 text-center leading-relaxed">
+                            The camp runs from <strong>May 1&aposs;t to May 31st</strong>, 5 days a week.
+                            <br />
+                            📍 51-8, 57/2, 60 Feet Road, Nakkavanipalem, Visakhapatnam, AP <br />
+                            ☎ +91 6302164335 <br />
+                            💳 Registration Fee: ₹250 | Total Fee: ₹2,000–₹2,500
+                        </p>
 
+                        {errorMessage && (
+                            <div className="text-red-500 mb-4">{errorMessage}</div>
+                        )}
 
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {[ 
+                            {[
                                 { name: "parentName", label: "Parent Name", required: true },
                                 { name: "childName", label: "Child Name", required: true },
                                 { name: "age", label: "Child Age", required: true },
@@ -123,8 +135,7 @@ const SummerCampPage = () => {
                                     💳 UPI Payment Details
                                 </h2>
                                 <p className="text-sm text-gray-700 mb-2">
-                                     You&apos;ll be redirected to UPI app after submitting this form.
-
+                                    You&apos;ll be redirected to UPI app after submitting this form.
                                 </p>
                                 <p className="text-gray-700 font-semibold mb-2">
                                     UPI ID:{" "}
