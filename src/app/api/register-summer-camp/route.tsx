@@ -3,6 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from 'zod';
 
+// Log envs for debugging (remove in production)
 console.log("Server ENV:", {
     region: process.env.MY_AWS_REGION,
     table: process.env.DYNAMODB_CAMP_TABLE,
@@ -12,10 +13,15 @@ console.log("Server ENV:", {
 
 const REGION = process.env.MY_AWS_REGION!;
 const TABLE_NAME = process.env.DYNAMODB_CAMP_TABLE!;
+const ACCESS_KEY_ID = process.env.MY_AWS_ACCESS_KEY_ID!;
+const SECRET_ACCESS_KEY = process.env.MY_AWS_SECRET_ACCESS_KEY!;
 
-// Use default credential provider chain
 const client = new DynamoDBClient({
     region: REGION,
+    credentials: {
+        accessKeyId: ACCESS_KEY_ID,
+        secretAccessKey: SECRET_ACCESS_KEY,
+    },
 });
 
 const ddb = DynamoDBDocumentClient.from(client);
@@ -37,8 +43,6 @@ export async function POST(req: NextRequest) {
         const validatedData = registrationSchema.parse(data);
         const { parentName, childName, age, contact, email, school } = validatedData;
 
-        console.log("API: Validated Data:", validatedData);
-
         const command = new PutCommand({
             TableName: TABLE_NAME,
             Item: {
@@ -53,8 +57,6 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        console.log("API: DynamoDB Command:", command);
-
         await ddb.send(command);
 
         console.log("API: Registration successful");
@@ -64,7 +66,6 @@ export async function POST(req: NextRequest) {
         console.error("API: Error:", error);
 
         if (error instanceof z.ZodError) {
-            console.error("API: Validation Error:", error.errors);
             return NextResponse.json({
                 error: "Validation error",
                 details: error.errors
@@ -72,17 +73,9 @@ export async function POST(req: NextRequest) {
         }
 
         if (error instanceof Error) {
-            console.error("API: Error Message:", error.message);
             return NextResponse.json({
                 error: "Internal Server Error",
                 message: error.message,
-                stack: error.stack, // TEMP ONLY
-                env: {
-                    REGION,
-                    TABLE_NAME,
-                    hasKey: !!process.env.MY_AWS_ACCESS_KEY_ID,
-                    hasSecret: !!process.env.MY_AWS_SECRET_ACCESS_KEY
-                }
             }, { status: 500 });
         }
 
