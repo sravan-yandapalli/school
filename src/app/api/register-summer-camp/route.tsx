@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { z } from 'zod';
+import { z } from "zod";
+import nodemailer from "nodemailer";
 
-// Log envs for debugging (remove in production)
-console.log("Server ENV:", {
-    region: process.env.MY_AWS_REGION,
-    table: process.env.DYNAMODB_CAMP_TABLE,
-    hasKey: !!process.env.MY_AWS_ACCESS_KEY_ID,
-    hasSecret: !!process.env.MY_AWS_SECRET_ACCESS_KEY
-});
-
+// Env variables
 const REGION = process.env.MY_AWS_REGION!;
 const TABLE_NAME = process.env.DYNAMODB_CAMP_TABLE!;
 const ACCESS_KEY_ID = process.env.MY_AWS_ACCESS_KEY_ID!;
 const SECRET_ACCESS_KEY = process.env.MY_AWS_SECRET_ACCESS_KEY!;
+const EMAIL_USER = process.env.EMAIL_USER!;
+const EMAIL_PASS = process.env.EMAIL_PASS!;
 
+// Initialize DynamoDB
 const client = new DynamoDBClient({
     region: REGION,
     credentials: {
@@ -26,6 +23,7 @@ const client = new DynamoDBClient({
 
 const ddb = DynamoDBDocumentClient.from(client);
 
+// Define schema
 const registrationSchema = z.object({
     parentName: z.string().min(1, "Parent name is required"),
     childName: z.string().min(1, "Child name is required"),
@@ -40,9 +38,11 @@ export async function POST(req: NextRequest) {
         const data = await req.json();
         console.log("API: Received Data:", data);
 
+        // Validate data
         const validatedData = registrationSchema.parse(data);
         const { parentName, childName, age, contact, email, school } = validatedData;
 
+        // Save to DynamoDB
         const command = new PutCommand({
             TableName: TABLE_NAME,
             Item: {
@@ -58,17 +58,49 @@ export async function POST(req: NextRequest) {
         });
 
         await ddb.send(command);
+        console.log("✅ DynamoDB: Registration saved");
 
-        console.log("API: Registration successful");
+        // Send email to parent (or fallback to admin)
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: EMAIL_USER,
+                pass: EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: `"Cocomelon Camp" <${EMAIL_USER}>`,
+            to: email || EMAIL_USER,
+            subject: "🎉 Cocomelon Summer Camp Registration Confirmation",
+            html: `
+                <h2>Hi ${parentName} 👋</h2>
+                <p>Thank you for registering <strong>${childName}</strong> for our Summer Camp!</p>
+                <p>Here are the submitted details:</p>
+                <ul>
+                    <li><strong>Child's Age:</strong> ${age}</li>
+                    <li><strong>School:</strong> ${school || "N/A"}</li>
+                    <li><strong>Contact:</strong> ${contact}</li>
+                </ul>
+                <p>🗓️ The camp runs from <strong>May 1st to May 31st</strong>, 5 days a week.</p>
+                <p>📍 Address: 51-8, 57/2, 60 Feet Road, Nakkavanipalem, Visakhapatnam, AP</p>
+                <p>💳 Registration Fee: ₹250. You will be redirected to UPI payment after submitting the form.</p>
+                <br/>
+                <p>See you soon!<br/>– Cocomelon Camp Team</p>
+            `,
+        });
+
+        console.log("📧 Email sent successfully");
+
         return NextResponse.json({ message: "Registration successful" }, { status: 201 });
 
     } catch (error: unknown) {
-        console.error("API: Error:", error);
+        console.error("❌ API Error:", error);
 
         if (error instanceof z.ZodError) {
             return NextResponse.json({
                 error: "Validation error",
-                details: error.errors
+                details: error.errors,
             }, { status: 400 });
         }
 
