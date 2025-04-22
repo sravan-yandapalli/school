@@ -18,7 +18,7 @@ const SummerCampPopup = () => {
     if (!showPopup) return null;
 
     return (
-        <div className="fixed inset-0  bg-opacity-10 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-10 flex justify-center items-center z-50">
 
 
             <div className="bg-white w-[90%] max-w-md p-6 rounded-xl shadow-2xl relative animate-fadeIn">
