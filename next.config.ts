@@ -1,8 +1,14 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "standalone", // Required for server functions (API routes) in Amplify
-  reactStrictMode: true, // Optional but recommended
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: "standalone",
+  reactStrictMode: true,
+  serverDependenciesToBundle: [
+    "@aws-sdk/client-dynamodb",
+    "@aws-sdk/lib-dynamodb"
+  ],
+  images: {
+    unoptimized: true
+  }
 };
 
-export default nextConfig;
+module.exports = nextConfig;
