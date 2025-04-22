@@ -5,17 +5,17 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from 'zod'; // For robust validation
 
 console.log("Server ENV:", {
-    region: process.env.NEXT_PUBLIC_AWS_REGION,
+    region: process.env.MY_AWS_REGION,
     table: process.env.DYNAMODB_CAMP_TABLE,
-    hasKey: !!process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
-    hasSecret: !!process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY // Sensitive! Only log for debugging
+    hasKey: !!process.env.MY_AWS_ACCESS_KEY_ID,
+    hasSecret: !!process.env.MY_SECRET_ACCESS_KEY // Sensitive! Only log for debugging
 });
 
 // Environment variables (SERVER-SIDE ONLY)
-const REGION = process.env.NEXT_PUBLIC_AWS_REGION!; // Use AWS_REGION, not NEXT_PUBLIC_*
+const REGION = process.env.MY_AWS_REGION!; // Use AWS_REGION, not NEXT_PUBLIC_*
 const TABLE_NAME = process.env.DYNAMODB_CAMP_TABLE!;
-const ACCESS_KEY_ID = process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!; // Sensitive!
-const SECRET_ACCESS_KEY = process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY!; // Sensitive!
+const ACCESS_KEY_ID = process.env.MY_AWS_ACCESS_KEY_ID!; // Sensitive!
+const SECRET_ACCESS_KEY = process.env.MY_AWS_SECRET_ACCESS_KEY!; // Sensitive!
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({
