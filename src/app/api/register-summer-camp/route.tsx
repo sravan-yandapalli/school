@@ -8,7 +8,7 @@ console.log("Server ENV:", {
     region: process.env.MY_AWS_REGION,
     table: process.env.DYNAMODB_CAMP_TABLE,
     hasKey: !!process.env.MY_AWS_ACCESS_KEY_ID,
-    hasSecret: !!process.env.MY_SECRET_ACCESS_KEY // Sensitive! Only log for debugging
+    hasSecret: !!process.env.MY_AWS_SECRET_ACCESS_KEY // Sensitive! Only log for debugging
 });
 
 // Environment variables (SERVER-SIDE ONLY)
