@@ -17,7 +17,7 @@ const Footer = () => {
           <div className="flex items-center gap-2">
             <FaMapMarkerAlt className="text-yellow-400" />
             <a
-              href="https://www.google.com/maps/dir//51-8,+57%2F2,+60+Feet+Road,+Nakkavanipalem,+Visakhapatnam,+Andhra+Pradesh+530013/"
+              href="https://www.google.com/maps/dir/?api=1&destination=51-8,+57%2F2,+60+Feet+Road,+Nakkavanipalem,+Visakhapatnam,+Andhra+Pradesh+530013"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-yellow-400 underline"
