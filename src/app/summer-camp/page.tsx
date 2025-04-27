@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import { QRCodeCanvas } from "qrcode.react";  // Import the QR code generator
+import { QRCodeCanvas } from "qrcode.react"; // Import the QR code generator
 
 interface FormData {
     parentName: string;
@@ -43,27 +42,33 @@ const SummerCampPage = () => {
                 body: JSON.stringify(form),
             });
 
-            const data = await res.json(); // Parse the response body
-
-            if (res.ok) {
-                setSubmitted(true);
-                // Redirect to UPI payment
-                const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
-                window.location.href = upiUrl;
-            } else {
-                // Handle errors from the server
-                if (data && data.error) {
-                    setErrorMessage(data.error);
-                } else {
-                    setErrorMessage("Something went wrong!");
+            if (!res.ok) {
+                // Handle non-200 responses
+                let errorText = "Something went wrong!";
+                try {
+                    const errorData = await res.json();
+                    if (errorData && errorData.error) {
+                        errorText = errorData.error;
+                    }
+                } catch (parseError) {
+                    // If parsing JSON fails, use the default message
+                    console.error("Error parsing error response:", parseError);
                 }
+                throw new Error(errorText); // Throw an error with the message
             }
-        } catch (error) {
-            console.error("Frontend Error:", error);
-            setErrorMessage("Failed to submit. Please check your connection.");
-        }
 
-        setLoading(false);
+            // If we reach here, the response is OK (200 range)
+            setSubmitted(true);
+            // Redirect to UPI payment
+            const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
+            window.location.href = upiUrl;
+
+        } catch (error: any) { // Type the error as any or Error
+            console.error("Frontend Error:", error);
+            setErrorMessage(error.message || "Failed to submit. Please check your connection.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -92,13 +97,20 @@ const SummerCampPage = () => {
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {[ 
+                            {[
                                 { name: "parentName", label: "Parent Name", required: true },
                                 { name: "childName", label: "Child Name", required: true },
                                 { name: "age", label: "Child Age", required: true },
-                                { name: "contact", label: "Contact Number", required: true, type: "tel", pattern: "[0-9]{10}", title: "Enter 10-digit mobile number" },
+                                {
+                                    name: "contact",
+                                    label: "Contact Number",
+                                    required: true,
+                                    type: "tel",
+                                    pattern: "[0-9]{10}",
+                                    title: "Enter 10-digit mobile number",
+                                },
                                 { name: "email", label: "Email (optional)", required: false, type: "email" },
-                                { name: "school", label: "School (optional)", required: false }
+                                { name: "school", label: "School (optional)", required: false },
                             ].map((field) => (
                                 <div key={field.name}>
                                     <label htmlFor={field.name} className="block text-sm font-medium text-violet-700 mb-1">
@@ -134,10 +146,10 @@ const SummerCampPage = () => {
                                 </p>
 
                                 {/* Dynamically generate QR Code */}
-                                <QRCodeCanvas 
-                                    value="upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR" 
-                                    size={180} 
-                                    className="mb-4 rounded border border-violet-200"
+                                <QRCodeCanvas
+                                    value="upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR"
+                                    size={180}
+                                    className="mb-4 rounded border border-violet-200 mx-auto" // Center the QR code
                                 />
                             </div>
 
