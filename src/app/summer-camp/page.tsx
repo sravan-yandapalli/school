@@ -1,8 +1,8 @@
-// File: src/app/page.tsx (or wherever your form is)
 "use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { QRCodeCanvas } from "qrcode.react";  // Import the QR code generator
 
 interface FormData {
     parentName: string;
@@ -67,7 +67,6 @@ const SummerCampPage = () => {
     };
 
     return (
-        // ... (Your JSX, with error message display)
         <div className="min-h-screen bg-gradient-to-br from-purple-100 to-violet-200 py-12 px-4 sm:px-8">
             <div className="max-w-3xl mx-auto bg-white shadow-2xl rounded-2xl p-8 border border-violet-200">
                 <h1 className="text-3xl sm:text-4xl font-bold text-violet-700 text-center mb-4">
@@ -81,7 +80,7 @@ const SummerCampPage = () => {
                 ) : (
                     <>
                         <p className="text-gray-800 text-sm sm:text-base mb-6 text-center leading-relaxed">
-                            The camp runs from <strong>May 1&aposs;t to May 31st</strong>, 5 days a week.
+                            The camp runs from <strong>May 1st to May 31st</strong>, 5 days a week.
                             <br />
                             📍 51-8, 57/2, 60 Feet Road, Nakkavanipalem, Visakhapatnam, AP <br />
                             ☎ +91 6302164335 <br />
@@ -93,26 +92,16 @@ const SummerCampPage = () => {
                         )}
 
                         <form onSubmit={handleSubmit} className="space-y-5">
-                            {[
+                            {[ 
                                 { name: "parentName", label: "Parent Name", required: true },
                                 { name: "childName", label: "Child Name", required: true },
                                 { name: "age", label: "Child Age", required: true },
-                                {
-                                    name: "contact",
-                                    label: "Contact Number",
-                                    required: true,
-                                    type: "tel",
-                                    pattern: "[0-9]{10}",
-                                    title: "Enter 10-digit mobile number",
-                                },
+                                { name: "contact", label: "Contact Number", required: true, type: "tel", pattern: "[0-9]{10}", title: "Enter 10-digit mobile number" },
                                 { name: "email", label: "Email (optional)", required: false, type: "email" },
-                                { name: "school", label: "School (optional)", required: false },
+                                { name: "school", label: "School (optional)", required: false }
                             ].map((field) => (
                                 <div key={field.name}>
-                                    <label
-                                        htmlFor={field.name}
-                                        className="block text-sm font-medium text-violet-700 mb-1"
-                                    >
+                                    <label htmlFor={field.name} className="block text-sm font-medium text-violet-700 mb-1">
                                         {field.label}
                                     </label>
                                     <input
@@ -143,11 +132,11 @@ const SummerCampPage = () => {
                                         yandapallisravankumar@oksbi
                                     </code>
                                 </p>
-                                <Image
-                                    src="/qr.jpg"
-                                    alt="QR Code"
-                                    width={180}
-                                    height={180}
+
+                                {/* Dynamically generate QR Code */}
+                                <QRCodeCanvas 
+                                    value="upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR" 
+                                    size={180} 
                                     className="mb-4 rounded border border-violet-200"
                                 />
                             </div>
