@@ -61,6 +61,8 @@ const SummerCampPage = () => {
             setSubmitted(true);
             // Redirect to UPI payment
             const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
+            console.log(upiUrl);
+            
             window.location.href = upiUrl;
 
         } catch (error) { // Type the error as Error
