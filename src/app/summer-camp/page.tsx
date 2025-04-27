@@ -1,181 +1,188 @@
 "use client";
 
-import React, { useState } from "react";
-import { QRCodeCanvas } from "qrcode.react"; // Import the QR code generator
+import { useState, useEffect } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 
-interface FormData {
-    parentName: string;
-    childName: string;
-    age: string;
-    contact: string;
-    email: string;
-    school: string;
-}
+export default function Desktop() {
+  const [parentName, setParentName] = useState("");
+  const [childName, setChildName] = useState("");
+  const [childAge, setChildAge] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [school, setSchool] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-const SummerCampPage = () => {
-    const [form, setForm] = useState<FormData>({
-        parentName: "",
-        childName: "",
-        age: "",
-        contact: "",
-        email: "",
-        school: "",
-    });
+  const [upiUrl, setUpiUrl] = useState<string>("");
 
-    const [loading, setLoading] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(""); // For displaying errors
+  useEffect(() => {
+    const upiID = "yandapallisravankumar@oksbi";
+    const amount = 250;
+    setUpiUrl(`upi://pay?pa=${upiID}&pn=SummerCamp&am=${amount}&cu=INR`);
+  }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+  const schoolsInVizag = [
+    "Cocomelon Pre School and Day Care",
+    "Delhi Public School",
+    "Sri Prakash Vidyaniketan",
+    "Timpany School",
+    "SFS School CBSE",
+    "SFS School State Board",
+    "Oakridge International School",
+    "Narayana School",
+    "Narayana E-Techno School",
+    "Sri Chaitanya Techno School",
+    "Bhashyam School",
+    "Bethany School",
+    "Siva Sivani Public School",
+    "Little Angels School",
+    "Greendale International School",
+    "Others",
+  ];
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setErrorMessage(""); // Clear previous errors
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-        try {
-            const res = await fetch("/api/register-summer-camp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
+    setLoading(true);
 
-            if (!res.ok) {
-                // Handle non-200 responses
-                let errorText = "Something went wrong!";
-                try {
-                    const errorData = await res.json();
-                    if (errorData && errorData.error) {
-                        errorText = errorData.error;
-                    }
-                } catch (parseError) {
-                    // If parsing JSON fails, use the default message
-                    console.error("Error parsing error response:", parseError);
-                }
-                throw new Error(errorText); // Throw an error with the message
-            }
+    try {
+      const response = await fetch("/api/register-summer-camp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          parentName,
+          childName,
+          age: childAge,
+          contact: phoneNumber,
+          email,
+          school,
+        }),
+      });
 
-            // If we reach here, the response is OK (200 range)
-            setSubmitted(true);
-            // Redirect to UPI payment
-            const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
-            console.log(upiUrl);
-            
-            window.location.href = upiUrl;
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        const errorData = await response.json();
+        alert(`Registration failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        } catch (error) { // Type the error as Error
-            let message = "Failed to submit. Please check your connection.";
-             if (error instanceof Error) {
-                message = error.message;
-             }
-            console.error("Frontend Error:", error);
-            setErrorMessage(message);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleCopyUPI = () => {
+    navigator.clipboard.writeText("yandapallisravankumar@oksbi");
+    alert("UPI ID copied to clipboard!");
+  };
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-100 to-violet-200 py-12 px-4 sm:px-8">
-            <div className="max-w-3xl mx-auto bg-white shadow-2xl rounded-2xl p-8 border border-violet-200">
-                <h1 className="text-3xl sm:text-4xl font-bold text-violet-700 text-center mb-4">
-                    🌞 Cocomelon&apos;s Summer Camp Registration
-                </h1>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-yellow-50 p-4">
+      {!submitted ? (
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md space-y-6"
+        >
+          <h1 className="text-3xl font-bold text-center text-blue-700 mb-4">
+            Summer Camp Registration
+          </h1>
 
-                {submitted ? (
-                    <p className="text-center text-green-600 text-lg font-semibold">
-                        ✅ Registration submitted! Redirecting to payment...
-                    </p>
-                ) : (
-                    <>
-                        <p className="text-gray-800 text-sm sm:text-base mb-6 text-center leading-relaxed">
-                            The camp runs from <strong>May 1st to May 31st</strong>, 5 days a week.
-                            <br />
-                            📍 51-8, 57/2, 60 Feet Road, Nakkavanipalem, Visakhapatnam, AP <br />
-                            ☎ +91 6302164335 <br />
-                            💳 Registration Fee: ₹250 | Total Fee: ₹2,000–₹2,500
-                        </p>
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Parent's Full Name"
+              value={parentName}
+              onChange={(e) => setParentName(e.target.value)}
+              required
+              className="w-full text-black p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <input
+              type="text"
+              placeholder="Child's Full Name"
+              value={childName}
+              onChange={(e) => setChildName(e.target.value)}
+              required
+              className="w-full text-black p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <input
+              type="number"
+              placeholder="Child's Age"
+              value={childAge}
+              onChange={(e) => setChildAge(e.target.value)}
+              required
+              className="w-full text-black p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <input
+              type="tel"
+              placeholder="Parent's Phone Number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+              className="w-full text-black p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <input
+              type="email"
+              placeholder="Email Address (optional)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full text-black p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <select
+              value={school}
+              onChange={(e) => setSchool(e.target.value)}
+              required
+              className="w-full text-black p-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="" disabled>
+                Select School
+              </option>
+              {schoolsInVizag.map((schoolName) => (
+                <option key={schoolName} value={schoolName}>
+                  {schoolName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                        {errorMessage && (
-                            <div className="text-red-500 mb-4">{errorMessage}</div>
-                        )}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit & Proceed"}
+          </button>
+        </form>
+      ) : (
+        <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md space-y-6 text-center">
+          <h2 className="text-2xl font-bold text-green-600">Registration Successful! 🎉</h2>
+          <p className="text-gray-600">
+            Please complete your payment of <strong>₹250</strong> to confirm your spot.
+          </p>
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            {[
-                                { name: "parentName", label: "Parent Name", required: true },
-                                { name: "childName", label: "Child Name", required: true },
-                                { name: "age", label: "Child Age", required: true },
-                                {
-                                    name: "contact",
-                                    label: "Contact Number",
-                                    required: true,
-                                    type: "tel",
-                                    pattern: "[0-9]{10}",
-                                    title: "Enter 10-digit mobile number",
-                                },
-                                { name: "email", label: "Email (optional)", required: false, type: "email" },
-                                { name: "school", label: "School (optional)", required: false },
-                            ].map((field) => (
-                                <div key={field.name}>
-                                    <label htmlFor={field.name} className="block text-sm font-medium text-violet-700 mb-1">
-                                        {field.label}
-                                    </label>
-                                    <input
-                                        type={field.type || "text"}
-                                        name={field.name}
-                                        id={field.name}
-                                        value={form[field.name as keyof FormData]}
-                                        onChange={handleChange}
-                                        required={field.required}
-                                        pattern={field.pattern}
-                                        title={field.title}
-                                        placeholder={field.label}
-                                        className="w-full px-4 py-2 border border-violet-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 transition placeholder:text-violet-100 text-gray-800"
-                                    />
-                                </div>
-                            ))}
+          <div className="flex flex-col items-center space-y-4">
+            <QRCodeCanvas value={upiUrl} size={200} />
+            <p className="text-gray-800 font-medium">Scan this QR with any UPI app</p>
+          </div>
 
-                            <div className="pt-4">
-                                <h2 className="text-md font-semibold text-violet-800 mb-2">
-                                    💳 UPI Payment Details
-                                </h2>
-                                <p className="text-sm text-gray-700 mb-2">
-                                    You&apos;ll be redirected to UPI app after submitting this form.
-                                </p>
-                                <p className="text-gray-700 font-semibold mb-2">
-                                    UPI ID:{" "}
-                                    <code className="bg-gray-100 px-2 py-1 rounded">
-                                        yandapallisravankumar@oksbi
-                                    </code>
-                                </p>
+          <div className="flex items-center justify-center space-x-2">
+            <span className="font-semibold text-gray-700">yandapallisravankumar@oksbi</span>
+            <button
+              onClick={handleCopyUPI}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-1 px-3 rounded-full transition-all"
+            >
+              Copy
+            </button>
+          </div>
 
-                                {/* Dynamically generate QR Code */}
-                                <QRCodeCanvas
-                                    value="upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR"
-                                    size={180}
-                                    className="mb-4 rounded border border-violet-200 mx-auto" // Center the QR code
-                                />
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-violet-600 text-white font-semibold px-4 py-3 rounded-md hover:bg-violet-700 transition"
-                            >
-                                {loading ? "Submitting..." : "Submit & Pay ₹250"}
-                            </button>
-                        </form>
-
-                        <p className="text-center text-sm text-red-600 mt-4 font-medium">
-                            🎟 Hurry! Limited seats available.
-                        </p>
-                    </>
-                )}
-            </div>
+          <p className="text-sm text-gray-500 mt-2">
+            You can also manually use the UPI ID in apps like PhonePe, Google Pay, Paytm etc.
+          </p>
         </div>
-    );
-};
-
-export default SummerCampPage;
+      )}
+    </div>
+  );
+}
