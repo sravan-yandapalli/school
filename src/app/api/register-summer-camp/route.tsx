@@ -3,6 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import nodemailer from "nodemailer";
+import { v4 as uuidv4 } from "uuid"; // UUID package (install: npm install uuid)
 
 // Env variables
 const REGION = process.env.MY_AWS_REGION!;
@@ -20,7 +21,6 @@ const client = new DynamoDBClient({
         secretAccessKey: SECRET_ACCESS_KEY,
     },
 });
-
 const ddb = DynamoDBDocumentClient.from(client);
 
 // Define schema
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         const command = new PutCommand({
             TableName: TABLE_NAME,
             Item: {
-                registration_id: Date.now().toString(),
+                registration_id: uuidv4(), // safer than Date.now()
                 parentName,
                 childName,
                 age,
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         await ddb.send(command);
         console.log("✅ DynamoDB: Registration saved");
 
-        // Send email to parent (or fallback to admin)
+        // Send email to parent
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -98,19 +98,22 @@ export async function POST(req: NextRequest) {
         console.error("❌ API Error:", error);
 
         if (error instanceof z.ZodError) {
-            return NextResponse.json({
-                error: "Validation error",
-                details: error.errors,
-            }, { status: 400 });
+            return NextResponse.json(
+                { error: "Validation error", details: error.errors },
+                { status: 400 }
+            );
         }
 
         if (error instanceof Error) {
-            return NextResponse.json({
-                error: "Internal Server Error",
-                message: error.message,
-            }, { status: 500 });
+            return NextResponse.json(
+                { error: "Internal Server Error", message: error.message },
+                { status: 500 }
+            );
         }
 
-        return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+        return new NextResponse(JSON.stringify({ error: "Unexpected error" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 }
