@@ -63,9 +63,13 @@ const SummerCampPage = () => {
             const upiUrl = `upi://pay?pa=yandapallisravankumar@oksbi&pn=Cocomelon%20Camp&am=250&cu=INR`;
             window.location.href = upiUrl;
 
-        } catch (error: any) { // Type the error as any or Error
+        } catch (error) { // Type the error as Error
+            let message = "Failed to submit. Please check your connection.";
+             if (error instanceof Error) {
+                message = error.message;
+             }
             console.error("Frontend Error:", error);
-            setErrorMessage(error.message || "Failed to submit. Please check your connection.");
+            setErrorMessage(message);
         } finally {
             setLoading(false);
         }
